@@ -1,0 +1,40 @@
+### Android / Gradle ###
+.gradle/
+build/
+**/build/
+
+### Local configuration ###
+local.properties
+
+### Logs ###
+*.log
+
+### Android Studio ###
+.idea/
+*.iml
+captures/
+.externalNativeBuild/
+.cxx/
+out/
+
+### APK / AAB ###
+*.apk
+*.aab
+output.json
+
+### Kotlin / Java ###
+*.class
+*.dex
+*.hprof
+.kotlin/
+
+### Keystore ###
+*.jks
+*.keystore
+
+### Google Services ###
+google-services.json
+
+### OS ###
+.DS_Store
+Thumbs.db
