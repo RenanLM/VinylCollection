@@ -10,6 +10,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
 // Estado da UI para a busca na API
 sealed class SearchUiState {
@@ -19,7 +21,8 @@ sealed class SearchUiState {
     data class Error(val message: String) : SearchUiState()
 }
 
-class VinylViewModel(
+@HiltViewModel
+class VinylViewModel @Inject constructor(
     private val repository: VinylRepository
 ) : ViewModel() {
 
