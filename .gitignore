@@ -39,4 +39,4 @@ google-services.json
 .DS_Store
 Thumbs.db
 
-.artifacts
+.artifacts/
