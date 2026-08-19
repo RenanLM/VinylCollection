@@ -77,6 +77,7 @@ dependencies {
     implementation(libs.squareup.okhttp.logging)
     implementation(libs.dagger.hilt.android)
     implementation(libs.androidx.hilt.navigation.compose)
+    implementation(libs.androidx.hilt.lifecycle.viewmodel.compose)
     ksp(libs.dagger.hilt.compiler)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.coil.compose)
