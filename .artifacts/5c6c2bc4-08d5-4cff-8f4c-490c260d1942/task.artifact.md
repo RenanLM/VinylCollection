@@ -1,4 +1,0 @@
-- [x] Update `libs.versions.toml` with Material Icons libraries
-- [x] Update `app/build.gradle.kts` with Material Icons dependencies
-- [x] Sync Gradle
-- [x] Verify build
