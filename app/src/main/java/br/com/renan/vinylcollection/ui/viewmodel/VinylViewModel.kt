@@ -67,4 +67,10 @@ class VinylViewModel @Inject constructor(
             repository.saveVinylToCollection(vinylRecord)
         }
     }
+
+    fun removeVinylFromLocalCollection(vinylRecord: VinylRecord) {
+        viewModelScope.launch {
+            repository.removeVinylFromCollection(vinylRecord)
+        }
+    }
 }

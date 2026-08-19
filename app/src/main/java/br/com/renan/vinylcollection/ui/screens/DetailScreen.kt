@@ -7,6 +7,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -15,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import br.com.renan.vinylcollection.data.local.entity.VinylRecord
 import br.com.renan.vinylcollection.ui.viewmodel.SearchUiState
@@ -29,14 +31,24 @@ fun DetailScreen(
     onBackClick: () -> Unit
 ) {
     val searchState by viewModel.searchState.collectAsState()
+    val myCollection by viewModel.myCollection.collectAsState()
     val context = LocalContext.current
 
-    // Procura o disco específico na lista que já está carregada na memória pelo ViewModel
-    val selectedItem = remember(searchState, vinylId) {
-        if (searchState is SearchUiState.Success) {
+    // Procura na coleção local (Room) primeiro
+    val localItem = remember(myCollection, vinylId) {
+        myCollection.find { it.id == vinylId }
+    }
+
+    // Se não estiver local, verifica se está nos resultados de busca (Retrofit)
+    val remoteItem = remember(searchState, vinylId) {
+        if (localItem == null && searchState is SearchUiState.Success) {
             (searchState as SearchUiState.Success).results.find { it.id == vinylId }
         } else null
     }
+
+    val title = localItem?.title ?: remoteItem?.title ?: ""
+    val coverUrl = localItem?.coverUrl ?: remoteItem?.coverImage ?: ""
+    val isSaved = localItem != null
 
     Scaffold(
         topBar = {
@@ -50,37 +62,49 @@ fun DetailScreen(
             )
         },
         floatingActionButton = {
-            // Botão p/ salvar o disco no banco local
-            FloatingActionButton(
-                onClick = {
-                    selectedItem?.let { item ->
-                        // A API do Discogs costuma retornar "Artista - Título" no campo title.
-                        // Tratamento simples dos nomes para salvar no banco local.
-                        val parts = item.title.split(" - ", limit = 2)
+            if (isSaved) {
+                // Ação de REMOVER (Já existe no banco)
+                FloatingActionButton(
+                    onClick = {
+                        localItem.let {
+                            viewModel.removeVinylFromLocalCollection(it)
+                            Toast.makeText(context, "Disco removido!", Toast.LENGTH_SHORT).show()
+                            onBackClick()
+                        }
+                    },
+                    containerColor = MaterialTheme.colorScheme.errorContainer,
+                    contentColor = MaterialTheme.colorScheme.onErrorContainer
+                ) {
+                    Icon(Icons.Default.Delete, contentDescription = "Remover da Coleção")
+                }
+            } else if (remoteItem != null) {
+                // Ação de SALVAR (Veio da API)
+                FloatingActionButton(
+                    onClick = {
+                        val parts = remoteItem.title.split(" - ", limit = 2)
                         val artist = if (parts.size > 1) parts[0] else "Desconhecido"
-                        val title = if (parts.size > 1) parts[1] else item.title
+                        val titleParsed = if (parts.size > 1) parts[1] else remoteItem.title
 
                         val newRecord = VinylRecord(
-                            discogsId = item.id,
-                            title = title,
+                            discogsId = remoteItem.id,
+                            title = titleParsed,
                             artist = artist,
-                            coverUrl = item.coverImage,
-                            barcode = item.barcode?.firstOrNull(),
-                            condition = "Novo" // Condição padrão inicial
+                            coverUrl = remoteItem.coverImage,
+                            barcode = remoteItem.barcode?.firstOrNull(),
+                            condition = "Novo"
                         )
-
                         viewModel.addVinylToLocalCollection(newRecord)
                         Toast.makeText(context, "Disco salvo na sua coleção!", Toast.LENGTH_SHORT).show()
-                        onBackClick() // Volta para a tela anterior após salvar
-                    }
-                },
-                containerColor = MaterialTheme.colorScheme.primary
-            ) {
-                Icon(Icons.Default.FavoriteBorder, contentDescription = "Salvar na Coleção")
+                        onBackClick()
+                    },
+                    containerColor = MaterialTheme.colorScheme.primary
+                ) {
+                    Icon(Icons.Default.FavoriteBorder, contentDescription = "Salvar na Coleção")
+                }
             }
         }
     ) { paddingValues ->
-        if (selectedItem == null) {
+        if (localItem == null && remoteItem == null) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Text("Erro ao carregar detalhes do disco.")
             }
@@ -93,7 +117,7 @@ fun DetailScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 AsyncImage(
-                    model = selectedItem.coverImage,
+                    model = coverUrl,
                     contentDescription = "Capa do Disco",
                     modifier = Modifier
                         .fillMaxWidth()
@@ -104,19 +128,31 @@ fun DetailScreen(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = selectedItem.title,
+                    text = title,
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
                     modifier = Modifier.padding(horizontal = 16.dp)
                 )
 
-                if (!selectedItem.barcode.isNullOrEmpty()) {
+                if (isSaved) {
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "Código de barras: ${selectedItem.barcode.first()}",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        text = "Artista: ${localItem?.artist}",
+                        style = MaterialTheme.typography.bodyLarge
                     )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Surface(
+                        color = MaterialTheme.colorScheme.secondaryContainer,
+                        shape = MaterialTheme.shapes.small
+                    ) {
+                        Text(
+                            text = "Condição: ${localItem?.condition}",
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSecondaryContainer
+                        )
+                    }
                 }
             }
         }
