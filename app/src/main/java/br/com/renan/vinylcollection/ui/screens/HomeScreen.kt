@@ -6,6 +6,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -23,7 +24,8 @@ import coil.compose.AsyncImage
 fun HomeScreen(
     viewModel: VinylViewModel,
     onNavigateToSearch: () -> Unit,
-    onNavigateToDetail: (Int) -> Unit
+    onNavigateToDetail: (Int) -> Unit,
+    onNavigateToSettings: () -> Unit
 ) {
     // Coleta a lista do Room em tempo real
     val myCollection by viewModel.myCollection.collectAsState()
@@ -35,7 +37,12 @@ fun HomeScreen(
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                )
+                ),
+                actions = {
+                    IconButton(onClick = onNavigateToSettings) {
+                        Icon(Icons.Default.Settings, contentDescription = "Configurações")
+                    }
+                }
             )
         },
         floatingActionButton = {

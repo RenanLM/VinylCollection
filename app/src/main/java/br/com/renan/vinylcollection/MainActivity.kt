@@ -3,42 +3,28 @@ package br.com.renan.vinylcollection
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import br.com.renan.vinylcollection.ui.theme.VinylCollectionTheme
-import dagger.hilt.android.AndroidEntryPoint
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.hilt.navigation.compose.hiltViewModel
 import br.com.renan.vinylcollection.ui.navigation.AppNavigation
+import br.com.renan.vinylcollection.ui.theme.VinylCollectionTheme
+import br.com.renan.vinylcollection.ui.viewmodel.SettingsViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            VinylCollectionTheme {
+            // Instancia o ViewModel no topo do app
+            val settingsViewModel = hiltViewModel<SettingsViewModel>()
+            // Olha a configuração
+            val isDarkMode by settingsViewModel.isDarkMode.collectAsState()
+
+            // Passa a variável isDarkMode para o tema escolhido
+            VinylCollectionTheme(darkTheme = isDarkMode) {
                 AppNavigation()
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    VinylCollectionTheme {
-        Greeting("Android")
     }
 }
