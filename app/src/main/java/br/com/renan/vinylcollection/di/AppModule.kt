@@ -7,6 +7,8 @@ import br.com.renan.vinylcollection.data.local.dao.VinylRecordDao
 import br.com.renan.vinylcollection.data.network.api.DiscogsApiService
 import br.com.renan.vinylcollection.data.network.api.RetrofitClient
 import br.com.renan.vinylcollection.data.repository.VinylRepository
+import br.com.renan.vinylcollection.core.notifications.VinylNotificationManager
+
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -51,5 +53,11 @@ object AppModule {
         taskDao: TaskDao
     ): VinylRepository {
         return VinylRepository(apiService, vinylRecordDao, taskDao)
+    }
+
+    @Provides
+    @Singleton
+    fun provideVinylNotificationManager(@ApplicationContext context: Context): VinylNotificationManager {
+        return VinylNotificationManager(context)
     }
 }

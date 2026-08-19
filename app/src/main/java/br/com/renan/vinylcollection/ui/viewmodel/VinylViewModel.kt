@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import br.com.renan.vinylcollection.data.local.entity.VinylRecord
 import br.com.renan.vinylcollection.data.repository.VinylRepository
 import br.com.renan.vinylcollection.data.network.dto.SearchResultItem
+import br.com.renan.vinylcollection.core.notifications.VinylNotificationManager
+
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -23,7 +25,8 @@ sealed class SearchUiState {
 
 @HiltViewModel
 class VinylViewModel @Inject constructor(
-    private val repository: VinylRepository
+    private val repository: VinylRepository,
+    private val notificationManager: VinylNotificationManager
 ) : ViewModel() {
 
     // Coleção Local (Room)
@@ -65,6 +68,7 @@ class VinylViewModel @Inject constructor(
     fun addVinylToLocalCollection(vinylRecord: VinylRecord) {
         viewModelScope.launch {
             repository.saveVinylToCollection(vinylRecord)
+            notificationManager.showItemSavedNotification(vinylRecord.title)
         }
     }
 
