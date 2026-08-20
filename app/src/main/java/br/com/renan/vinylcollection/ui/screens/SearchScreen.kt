@@ -1,4 +1,8 @@
 package br.com.renan.vinylcollection.ui.screens
+import android.Manifest
+import android.content.pm.PackageManager
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -19,6 +23,12 @@ import br.com.renan.vinylcollection.data.network.dto.SearchResultItem
 import br.com.renan.vinylcollection.ui.viewmodel.SearchUiState
 import br.com.renan.vinylcollection.ui.viewmodel.VinylViewModel
 import coil.compose.AsyncImage
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.ContextCompat
+import br.com.renan.vinylcollection.ui.components.BarcodeScanner
+import androidx.compose.material.icons.filled.Warning
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.material.icons.filled.Close
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -32,6 +42,18 @@ fun SearchScreen(
 
     // Estado local para guardar o texto que o usuário digita
     var searchQuery by remember { mutableStateOf("") }
+
+    // Controles da câmera
+    var isScannerVisible by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+
+    val cameraPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            isScannerVisible = true
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -62,6 +84,23 @@ fun SearchScreen(
                     .padding(16.dp),
                 placeholder = { Text("Nome do álbum ou artista...") },
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+                trailingIcon = {
+                    IconButton(
+                        onClick = {
+                            val isCameraGranted = ContextCompat.checkSelfPermission(
+                                context, Manifest.permission.CAMERA
+                            ) == PackageManager.PERMISSION_GRANTED
+
+                            if (isCameraGranted) {
+                                isScannerVisible = true
+                            } else {
+                                cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+                            }
+                        }
+                    ) {
+                        Text("📷")
+                    }
+                },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
                 keyboardActions = KeyboardActions(
@@ -73,43 +112,62 @@ fun SearchScreen(
                 )
             )
 
-            // Conteúdo baseado no Estado da API
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .weight(1f),
-                contentAlignment = Alignment.Center
-            ) {
-                when (val state = searchState) {
-                    is SearchUiState.Idle -> {
-                        Text("Digite o nome de um disco para começar.")
+            if (isScannerVisible) {
+                Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
+                    BarcodeScanner(
+                        onBarcodeScanned = { barcode ->
+                            isScannerVisible = false
+                            searchQuery = barcode // Preenche a barra com os números
+                            viewModel.searchVinylOnDiscogs(barcode)
+                        }
+                    )
+                    // Botão para fechar a câmera
+                    IconButton(
+                        onClick = { isScannerVisible = false },
+                        modifier = Modifier.align(Alignment.TopEnd).padding(16.dp)
+                    ) {
+                        Icon(Icons.Default.Close, contentDescription = "Fechar", tint = MaterialTheme.colorScheme.error)
                     }
-                    is SearchUiState.Loading -> {
-                        CircularProgressIndicator()
-                    }
-                    is SearchUiState.Error -> {
-                        Text("Erro: ${state.message}", color = MaterialTheme.colorScheme.error)
-                    }
-                    is SearchUiState.Success -> {
-                        if (state.results.isEmpty()) {
-                            Text("Nenhum resultado encontrado.")
-                        } else {
-                            LazyColumn(
-                                modifier = Modifier.fillMaxSize(),
-                                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                                verticalArrangement = Arrangement.spacedBy(12.dp)
-                            ) {
-                                items(state.results) { item ->
-                                    SearchResultRow(
-                                        item = item,
-                                        onClick = { onVinylClick(item.id) }
-                                    )
+                }
+            } else {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .weight(1f),
+                    contentAlignment = Alignment.Center
+                ) {
+                    when (val state = searchState) {
+                        is SearchUiState.Idle -> {
+                            Text("Digite o nome de um disco para começar.")
+                        }
+                        is SearchUiState.Loading -> {
+                            CircularProgressIndicator()
+                        }
+                        is SearchUiState.Error -> {
+                            Text("Erro: ${state.message}", color = MaterialTheme.colorScheme.error)
+                        }
+                        is SearchUiState.Success -> {
+                            if (state.results.isEmpty()) {
+                                Text("Nenhum resultado encontrado.")
+                            } else {
+                                LazyColumn(
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                                ) {
+                                    items(state.results) { item ->
+                                        SearchResultRow(
+                                            item = item,
+                                            onClick = { onVinylClick(item.id) }
+                                        )
+                                    }
                                 }
                             }
                         }
                     }
                 }
             }
+
         }
     }
 }
