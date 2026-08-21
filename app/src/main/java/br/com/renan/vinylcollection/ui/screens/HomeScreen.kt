@@ -19,6 +19,9 @@ import br.com.renan.vinylcollection.data.local.entity.VinylRecord
 import br.com.renan.vinylcollection.ui.viewmodel.VinylViewModel
 import coil.compose.AsyncImage
 
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
@@ -104,18 +107,25 @@ fun CollectionItemRow(record: VinylRecord, onClick: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
+        )
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(8.dp),
+                .padding(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
+
             AsyncImage(
                 model = record.coverUrl,
                 contentDescription = "Capa de ${record.title}",
-                modifier = Modifier.size(80.dp),
+                modifier = Modifier
+                    .size(90.dp)
+                    .clip(RoundedCornerShape(8.dp)),
                 contentScale = ContentScale.Crop
             )
 
@@ -124,30 +134,35 @@ fun CollectionItemRow(record: VinylRecord, onClick: () -> Unit) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = record.title,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-                Text(
-                    text = record.artist,
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.ExtraBold,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
-                Spacer(modifier = Modifier.height(6.dp))
 
-                // Pequena tag p/ mostrar a condição do disco
+                Spacer(modifier = Modifier.height(2.dp))
+
+                Text(
+                    text = record.artist,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.primary,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
                 Surface(
-                    color = MaterialTheme.colorScheme.secondaryContainer,
-                    shape = MaterialTheme.shapes.small
+                    color = MaterialTheme.colorScheme.secondary,
+                    shape = RoundedCornerShape(50)
                 ) {
                     Text(
                         text = record.condition ?: "Desconhecido",
-                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSecondaryContainer
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSecondary
                     )
                 }
             }

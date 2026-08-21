@@ -23,6 +23,10 @@ import br.com.renan.vinylcollection.ui.viewmodel.SearchUiState
 import br.com.renan.vinylcollection.ui.viewmodel.VinylViewModel
 import coil.compose.AsyncImage
 
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DetailScreen(
@@ -121,7 +125,10 @@ fun DetailScreen(
                     contentDescription = "Capa do Disco",
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(300.dp),
+                        .height(350.dp)
+                        .padding(16.dp)
+                        .shadow(12.dp, RoundedCornerShape(16.dp))
+                        .clip(RoundedCornerShape(16.dp)),
                     contentScale = ContentScale.Crop
                 )
 

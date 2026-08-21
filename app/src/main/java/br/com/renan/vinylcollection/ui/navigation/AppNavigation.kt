@@ -14,13 +14,43 @@ import br.com.renan.vinylcollection.ui.screens.SettingsScreen
 import br.com.renan.vinylcollection.ui.viewmodel.SettingsViewModel
 import br.com.renan.vinylcollection.ui.viewmodel.VinylViewModel
 
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
 
     val sharedViewModel: VinylViewModel = hiltViewModel()
 
-    NavHost(navController = navController, startDestination = Screen.Home.route) {
+    NavHost(
+        navController = navController,
+        startDestination = Screen.Home.route,
+        // Animação ao ENTRAR em uma nova tela
+        enterTransition = {
+            slideIntoContainer(
+                AnimatedContentTransitionScope.SlideDirection.Left,
+                animationSpec = tween(400)
+            ) + fadeIn(animationSpec = tween(400))
+        },
+        // Animação da tela anterior SAINDO
+        exitTransition = {
+            fadeOut(animationSpec = tween(400))
+        },
+        // Animação ao VOLTAR
+        popEnterTransition = {
+            fadeIn(animationSpec = tween(400))
+        },
+        // Animação da tela atual SAINDO ao voltar
+        popExitTransition = {
+            slideOutOfContainer(
+                AnimatedContentTransitionScope.SlideDirection.Right,
+                animationSpec = tween(400)
+            ) + fadeOut(animationSpec = tween(400))
+        }
+    ) {
 
         composable(Screen.Settings.route) {
             val settingsViewModel = hiltViewModel<SettingsViewModel>()
