@@ -11,5 +11,7 @@ data class SearchResultItem(
     val title: String,
     @SerializedName("cover_image")
     val coverImage: String?,
-    val barcode: List<String>?
+    val barcode: List<String>?,
+    val year: String?,
+    val genre: List<String>?
 )

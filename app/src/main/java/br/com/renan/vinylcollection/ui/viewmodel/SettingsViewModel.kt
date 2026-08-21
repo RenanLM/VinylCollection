@@ -27,4 +27,11 @@ class SettingsViewModel @Inject constructor(
             settingsRepository.toggleDarkMode(isDark)
         }
     }
+
+    val sortOrder: StateFlow<String> = settingsRepository.sortOrder
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "RECENT")
+
+    fun updateSortOrder(order: String) {
+        viewModelScope.launch { settingsRepository.updateSortOrder(order) }
+    }
 }

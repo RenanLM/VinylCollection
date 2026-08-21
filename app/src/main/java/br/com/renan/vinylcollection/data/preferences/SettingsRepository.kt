@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
+import androidx.datastore.preferences.core.stringPreferencesKey
 
 // Cria a instância única do DataStore
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "user_settings")
@@ -21,17 +22,22 @@ class SettingsRepository @Inject constructor(
 ) {
     companion object {
         val DARK_MODE_KEY = booleanPreferencesKey("dark_mode")
+        val SORT_ORDER_KEY = stringPreferencesKey("sort_order") // Nova chave
     }
 
-    // Lê a preferência. Retorna um Flow para atualizar a UI insta se mudar
-    val isDarkMode: Flow<Boolean> = context.dataStore.data.map { preferences ->
-        preferences[DARK_MODE_KEY] ?: false
-    }
+    val isDarkMode: Flow<Boolean> = context.dataStore.data.map { it[DARK_MODE_KEY] ?: false }
 
-    // Slava a nova preferência
+    val sortOrder: Flow<String> = context.dataStore.data.map { it[SORT_ORDER_KEY] ?: "RECENT" }
+
     suspend fun toggleDarkMode(isDark: Boolean) {
         context.dataStore.edit { preferences ->
             preferences[DARK_MODE_KEY] = isDark
+        }
+    }
+
+    suspend fun updateSortOrder(order: String) {
+        context.dataStore.edit { preferences ->
+            preferences[SORT_ORDER_KEY] = order
         }
     }
 }

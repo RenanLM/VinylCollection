@@ -16,7 +16,9 @@ fun SettingsScreen(
     viewModel: SettingsViewModel,
     onBackClick: () -> Unit
 ) {
+
     val isDarkMode by viewModel.isDarkMode.collectAsState()
+    val currentSort by viewModel.sortOrder.collectAsState()
 
     Scaffold(
         topBar = {
@@ -36,6 +38,7 @@ fun SettingsScreen(
                 .padding(paddingValues)
                 .padding(16.dp)
         ) {
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
@@ -47,15 +50,44 @@ fun SettingsScreen(
                 )
                 Switch(
                     checked = isDarkMode,
-                    onCheckedChange = { viewModel.toggleDarkMode(it) }
+                    onCheckedChange = { viewModel.toggleDarkMode(it) } // O disparo acontece aqui!
                 )
             }
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "Ativa o tema escuro no app.",
+                text = "Ativa o tema escuro em todo o aplicativo.",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
+
+            HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
+
+            Text("Ordenar Coleção por:", style = MaterialTheme.typography.titleMedium)
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Column {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    RadioButton(
+                        selected = currentSort == "RECENT",
+                        onClick = { viewModel.updateSortOrder("RECENT") }
+                    )
+                    Text("Recém Adicionados")
+                }
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    RadioButton(
+                        selected = currentSort == "TITLE",
+                        onClick = { viewModel.updateSortOrder("TITLE") }
+                    )
+                    Text("Título (A-Z)")
+                }
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    RadioButton(
+                        selected = currentSort == "ARTIST",
+                        onClick = { viewModel.updateSortOrder("ARTIST") }
+                    )
+                    Text("Artista (A-Z)")
+                }
+            }
         }
     }
 }

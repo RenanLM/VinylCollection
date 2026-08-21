@@ -12,5 +12,7 @@ data class VinylRecord(
     val artist: String,
     val coverUrl: String?,
     val barcode: String?,
-    val condition: String?
+    val condition: String?,
+    val year: String?,
+    val genre: String?
 )

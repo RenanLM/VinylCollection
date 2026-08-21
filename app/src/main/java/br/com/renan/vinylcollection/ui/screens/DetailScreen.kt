@@ -95,7 +95,9 @@ fun DetailScreen(
                             artist = artist,
                             coverUrl = remoteItem.coverImage,
                             barcode = remoteItem.barcode?.firstOrNull(),
-                            condition = "Novo"
+                            condition = "Novo",
+                            year = remoteItem.year, // Salva o ano
+                            genre = remoteItem.genre?.joinToString(" • ")
                         )
                         viewModel.addVinylToLocalCollection(newRecord)
                         Toast.makeText(context, "Disco salvo na sua coleção!", Toast.LENGTH_SHORT).show()
@@ -141,6 +143,21 @@ fun DetailScreen(
                     textAlign = TextAlign.Center,
                     modifier = Modifier.padding(horizontal = 16.dp)
                 )
+
+                val displayYear = localItem?.year ?: remoteItem?.year
+                val displayGenre = localItem?.genre ?: remoteItem?.genre?.joinToString(" • ")
+
+                if (!displayYear.isNullOrBlank()) {
+                    Text(text = "Ano: $displayYear", style = MaterialTheme.typography.bodyLarge)
+                }
+                if (!displayGenre.isNullOrBlank()) {
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = displayGenre,
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
 
                 if (isSaved) {
                     Spacer(modifier = Modifier.height(8.dp))

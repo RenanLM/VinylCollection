@@ -30,7 +30,7 @@ abstract class VinylCollectionDatabase : RoomDatabase() {
                     VinylCollectionDatabase::class.java,
                     "vinyl_collection_db"
                 )
-                    // .fallbackToDestructiveMigration()
+                    .fallbackToDestructiveMigration(true)
                     .build()
 
                 INSTANCE = instance

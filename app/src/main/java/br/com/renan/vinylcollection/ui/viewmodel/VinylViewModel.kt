@@ -15,6 +15,11 @@ import kotlinx.coroutines.launch
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
+import br.com.renan.vinylcollection.data.preferences.SettingsRepository
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
+
 // Estado da UI para a busca na API
 sealed class SearchUiState {
     object Idle : SearchUiState()
@@ -26,30 +31,24 @@ sealed class SearchUiState {
 @HiltViewModel
 class VinylViewModel @Inject constructor(
     private val repository: VinylRepository,
-    private val notificationManager: VinylNotificationManager
+    private val notificationManager: VinylNotificationManager,
+    private val settingsRepository: SettingsRepository
 ) : ViewModel() {
 
-    // Coleção Local (Room)
-    private val _myCollection = MutableStateFlow<List<VinylRecord>>(emptyList())
-    val myCollection: StateFlow<List<VinylRecord>> = _myCollection.asStateFlow()
+    val myCollection: StateFlow<List<VinylRecord>> = combine(
+        repository.getMyCollection(),
+        settingsRepository.sortOrder
+    ) { records, sortOrder ->
+        when (sortOrder) {
+            "TITLE" -> records.sortedBy { it.title }
+            "ARTIST" -> records.sortedBy { it.artist }
+            else -> records.sortedByDescending { it.id } // RECENT
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     // Busca Remota (Discogs API)
     private val _searchState = MutableStateFlow<SearchUiState>(SearchUiState.Idle)
     val searchState: StateFlow<SearchUiState> = _searchState.asStateFlow()
-
-    init {
-        loadMyCollection()
-    }
-
-    private fun loadMyCollection() {
-        viewModelScope.launch {
-            repository.getMyCollection()
-                .catch { /* Lidar com erro de banco, se necessário */ }
-                .collect { records ->
-                    _myCollection.value = records
-                }
-        }
-    }
 
     fun searchVinylOnDiscogs(query: String) {
         viewModelScope.launch {
