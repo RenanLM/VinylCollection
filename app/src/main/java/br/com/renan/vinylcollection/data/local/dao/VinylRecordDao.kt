@@ -13,6 +13,9 @@ interface VinylRecordDao {
     @Query("SELECT * FROM vinyl_records WHERE id = :id")
     fun getVinylRecordById(id: Int): Flow<VinylRecord?>
 
+    @Query("SELECT * FROM vinyl_records ORDER BY RANDOM() LIMIT 1")
+    suspend fun getRandomVinylRecord(): VinylRecord?
+
     // Funções suspend para rodar de forma assíncrona usando Coroutines
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertVinylRecord(vinylRecord: VinylRecord): Long

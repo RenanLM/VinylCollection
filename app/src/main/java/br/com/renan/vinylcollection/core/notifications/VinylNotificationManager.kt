@@ -45,4 +45,16 @@ class VinylNotificationManager @Inject constructor(
 
         notificationManager.notify(System.currentTimeMillis().toInt(), notification)
     }
+
+    fun showDailyVinylNotification(title: String, artist: String) {
+        val notification = NotificationCompat.Builder(context, channelId)
+            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setContentTitle("🎵 Disco do Dia!")
+            .setContentText("Que tal ouvir '$title' do $artist hoje?")
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setAutoCancel(true)
+            .build()
+
+        notificationManager.notify(System.currentTimeMillis().toInt(), notification)
+    }
 }
