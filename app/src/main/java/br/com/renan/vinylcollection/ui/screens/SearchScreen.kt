@@ -16,6 +16,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
@@ -98,7 +99,11 @@ fun SearchScreen(
                             }
                         }
                     ) {
-                        Text("📷")
+                        Icon(
+                            imageVector = Icons.Default.PhotoCamera,
+                            contentDescription = "Escanear código de barras",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
                     }
                 },
                 singleLine = true,
@@ -186,7 +191,6 @@ fun SearchResultRow(item: SearchResultItem, onClick: () -> Unit) {
                 .padding(8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Imagem sendo carregada via internet magicamente pelo Coil
             AsyncImage(
                 model = item.coverImage,
                 contentDescription = "Capa do Disco",
