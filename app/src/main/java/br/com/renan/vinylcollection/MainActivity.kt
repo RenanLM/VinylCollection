@@ -37,11 +37,10 @@ class MainActivity : ComponentActivity() {
             val isDarkMode by settingsViewModel.isDarkMode.collectAsState()
             val context = LocalContext.current
 
-            // Pede permissão de notificação
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 val permissionLauncher = rememberLauncherForActivityResult(
                     contract = ActivityResultContracts.RequestPermission(),
-                    onResult = { /* Podemos ignorar o resultado ou mostrar um aviso caso seja negado */ }
+                    onResult = { }
                 )
 
                 LaunchedEffect(Unit) {
@@ -59,7 +58,8 @@ class MainActivity : ComponentActivity() {
 
     private fun scheduleDailyVinylWork() {
         val now = LocalDateTime.now()
-        var target = LocalDateTime.of(now.toLocalDate(), LocalTime.of(20, 0))
+        val targetTime = LocalTime.of(20, 0)
+        var target = LocalDateTime.of(now.toLocalDate(), targetTime)
 
         if (now.isAfter(target)) {
             target = target.plusDays(1)
@@ -71,14 +71,15 @@ class MainActivity : ComponentActivity() {
             .setInitialDelay(initialDelay, TimeUnit.MILLISECONDS)
             .build()
 
-        Log.d("MainActivity", "Scheduling DailyVinylWorker for 20:00. Initial delay: ${initialDelay / 1000 / 60} minutes")
+        Log.d("MainActivity", "Agendando DailyVinylWorker para ${targetTime}. Delay inicial: ${initialDelay / 1000 / 60} min")
 
         WorkManager.getInstance(applicationContext).enqueueUniquePeriodicWork(
             "DailyVinylRoulette",
-            ExistingPeriodicWorkPolicy.KEEP,
+            ExistingPeriodicWorkPolicy.UPDATE,
             dailyWorkRequest
         )
 
+        // Limpa o worker de teste único
         WorkManager.getInstance(applicationContext).cancelUniqueWork("DailyVinylRouletteTest")
     }
 }

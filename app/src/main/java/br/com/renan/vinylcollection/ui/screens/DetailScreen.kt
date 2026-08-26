@@ -38,12 +38,10 @@ fun DetailScreen(
     val myCollection by viewModel.myCollection.collectAsState()
     val context = LocalContext.current
 
-    // Procura na coleção local (Room) primeiro
     val localItem = remember(myCollection, vinylId) {
         myCollection.find { it.id == vinylId }
     }
 
-    // Se não estiver local, verifica se está nos resultados de busca (Retrofit)
     val remoteItem = remember(searchState, vinylId) {
         if (localItem == null && searchState is SearchUiState.Success) {
             (searchState as SearchUiState.Success).results.find { it.id == vinylId }
@@ -67,7 +65,6 @@ fun DetailScreen(
         },
         floatingActionButton = {
             if (isSaved) {
-                // Ação de REMOVER (Já existe no banco)
                 FloatingActionButton(
                     onClick = {
                         localItem.let {
@@ -82,7 +79,6 @@ fun DetailScreen(
                     Icon(Icons.Default.Delete, contentDescription = "Remover da Coleção")
                 }
             } else if (remoteItem != null) {
-                // Ação de SALVAR (Veio da API)
                 FloatingActionButton(
                     onClick = {
                         val parts = remoteItem.title.split(" - ", limit = 2)
@@ -96,7 +92,7 @@ fun DetailScreen(
                             coverUrl = remoteItem.coverImage,
                             barcode = remoteItem.barcode?.firstOrNull(),
                             condition = "Novo",
-                            year = remoteItem.year, // Salva o ano
+                            year = remoteItem.year,
                             genre = remoteItem.genre?.joinToString(" • ")
                         )
                         viewModel.addVinylToLocalCollection(newRecord)

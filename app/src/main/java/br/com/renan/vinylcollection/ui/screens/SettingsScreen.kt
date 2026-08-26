@@ -50,7 +50,7 @@ fun SettingsScreen(
                 )
                 Switch(
                     checked = isDarkMode,
-                    onCheckedChange = { viewModel.toggleDarkMode(it) } // O disparo acontece aqui!
+                    onCheckedChange = { viewModel.toggleDarkMode(it) }
                 )
             }
             Spacer(modifier = Modifier.height(8.dp))

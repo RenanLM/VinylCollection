@@ -1,6 +1,7 @@
 package br.com.renan.vinylcollection.core.workers
 
 import android.content.Context
+import android.util.Log
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
@@ -13,13 +14,15 @@ import dagger.assisted.AssistedInject
 class DailyVinylWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted workerParams: WorkerParameters,
-    private val vinylDao: VinylRecordDao, // Injeta o banco de dados
-    private val notificationManager: VinylNotificationManager // Injeta o disparador de notificação
+    private val vinylDao: VinylRecordDao,
+    private val notificationManager: VinylNotificationManager
 ) : CoroutineWorker(context, workerParams) {
 
     override suspend fun doWork(): Result {
+        Log.d("DailyVinylWorker", "Executando worker diário...")
         return try {
             val randomRecord = vinylDao.getRandomVinylRecord()
+            Log.d("DailyVinylWorker", "Disco sorteado: ${randomRecord?.title ?: "Nenhum"}")
 
             if (randomRecord != null) {
                 notificationManager.showDailyVinylNotification(
@@ -30,6 +33,7 @@ class DailyVinylWorker @AssistedInject constructor(
 
             Result.success()
         } catch (_: Exception) {
+            Log.e("DailyVinylWorker", "Erro ao executar worker")
             Result.retry()
         }
     }

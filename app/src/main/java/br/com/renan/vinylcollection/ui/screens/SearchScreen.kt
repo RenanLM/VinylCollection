@@ -38,13 +38,10 @@ fun SearchScreen(
     onBackClick: () -> Unit,
     onVinylClick: (Int) -> Unit
 ) {
-    // Pegando o estado que vem do ViewModel
     val searchState by viewModel.searchState.collectAsState()
 
-    // Estado local para guardar o texto que o usuário digita
     var searchQuery by remember { mutableStateOf("") }
 
-    // Controles da câmera
     var isScannerVisible by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
@@ -122,11 +119,10 @@ fun SearchScreen(
                     BarcodeScanner(
                         onBarcodeScanned = { barcode ->
                             isScannerVisible = false
-                            searchQuery = barcode // Preenche a barra com os números
+                            searchQuery = barcode
                             viewModel.searchVinylOnDiscogs(barcode)
                         }
                     )
-                    // Botão para fechar a câmera
                     IconButton(
                         onClick = { isScannerVisible = false },
                         modifier = Modifier.align(Alignment.TopEnd).padding(16.dp)

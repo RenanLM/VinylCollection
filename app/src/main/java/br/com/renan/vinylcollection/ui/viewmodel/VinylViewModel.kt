@@ -20,7 +20,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 
-// Estado da UI para a busca na API
 sealed class SearchUiState {
     object Idle : SearchUiState()
     object Loading : SearchUiState()
@@ -42,11 +41,10 @@ class VinylViewModel @Inject constructor(
         when (sortOrder) {
             "TITLE" -> records.sortedBy { it.title }
             "ARTIST" -> records.sortedBy { it.artist }
-            else -> records.sortedByDescending { it.id } // RECENT
+            else -> records.sortedByDescending { it.id }
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    // Busca Remota (Discogs API)
     private val _searchState = MutableStateFlow<SearchUiState>(SearchUiState.Idle)
     val searchState: StateFlow<SearchUiState> = _searchState.asStateFlow()
 

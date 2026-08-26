@@ -20,21 +20,18 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object AppModule {
 
-    // API do Discogs
     @Provides
     @Singleton
     fun provideDiscogsApiService(): DiscogsApiService {
         return RetrofitClient.apiService
     }
 
-    // Local (Room)
     @Provides
     @Singleton
     fun provideDatabase(@ApplicationContext context: Context): VinylCollectionDatabase {
         return VinylCollectionDatabase.getDatabase(context)
     }
 
-    // DAOs
     @Provides
     fun provideVinylRecordDao(database: VinylCollectionDatabase): VinylRecordDao {
         return database.vinylRecordDao()

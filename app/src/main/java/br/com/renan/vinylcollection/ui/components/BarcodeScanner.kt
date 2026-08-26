@@ -41,18 +41,15 @@ fun BarcodeScanner(
             cameraProviderFuture.addListener({
                 val cameraProvider = cameraProviderFuture.get()
 
-                // Configura o visualizador da câmera na tela
                 val preview = Preview.Builder().build().also {
                     it.setSurfaceProvider(previewView.surfaceProvider)
                 }
 
-                // Configura para ler códigos de barras
                 val options = BarcodeScannerOptions.Builder()
                     .setBarcodeFormats(Barcode.FORMAT_ALL_FORMATS)
                     .build()
                 val scanner = BarcodeScanning.getClient(options)
 
-                // Analisa os quadros da câmera em tempo real
                 val imageAnalysis = ImageAnalysis.Builder()
                     .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                     .build()

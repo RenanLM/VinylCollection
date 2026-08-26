@@ -6,7 +6,6 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface VinylRecordDao {
-    // Retorna um Flow para que a UI reaja automaticamente a mudanças na base de dados
     @Query("SELECT * FROM vinyl_records ORDER BY title ASC")
     fun getAllVinylRecords(): Flow<List<VinylRecord>>
 
@@ -16,7 +15,6 @@ interface VinylRecordDao {
     @Query("SELECT * FROM vinyl_records ORDER BY RANDOM() LIMIT 1")
     suspend fun getRandomVinylRecord(): VinylRecord?
 
-    // Funções suspend para rodar de forma assíncrona usando Coroutines
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertVinylRecord(vinylRecord: VinylRecord): Long
 

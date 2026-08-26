@@ -28,22 +28,18 @@ fun AppNavigation() {
     NavHost(
         navController = navController,
         startDestination = Screen.Home.route,
-        // Animação ao ENTRAR em uma nova tela
         enterTransition = {
             slideIntoContainer(
                 AnimatedContentTransitionScope.SlideDirection.Left,
                 animationSpec = tween(400)
             ) + fadeIn(animationSpec = tween(400))
         },
-        // Animação da tela anterior SAINDO
         exitTransition = {
             fadeOut(animationSpec = tween(400))
         },
-        // Animação ao VOLTAR
         popEnterTransition = {
             fadeIn(animationSpec = tween(400))
         },
-        // Animação da tela atual SAINDO ao voltar
         popExitTransition = {
             slideOutOfContainer(
                 AnimatedContentTransitionScope.SlideDirection.Right,

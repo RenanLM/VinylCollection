@@ -30,7 +30,6 @@ fun HomeScreen(
     onNavigateToDetail: (Int) -> Unit,
     onNavigateToSettings: () -> Unit
 ) {
-    // Coleta a lista do Room em tempo real
     val myCollection by viewModel.myCollection.collectAsState()
 
     Scaffold(
@@ -80,7 +79,6 @@ fun HomeScreen(
                     )
                 }
             } else {
-                // Lista de Discos da Coleção
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(16.dp),

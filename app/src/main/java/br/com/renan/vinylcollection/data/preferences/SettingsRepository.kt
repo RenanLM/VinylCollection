@@ -13,7 +13,6 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import androidx.datastore.preferences.core.stringPreferencesKey
 
-// Cria a instância única do DataStore
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "user_settings")
 
 @Singleton
@@ -22,7 +21,7 @@ class SettingsRepository @Inject constructor(
 ) {
     companion object {
         val DARK_MODE_KEY = booleanPreferencesKey("dark_mode")
-        val SORT_ORDER_KEY = stringPreferencesKey("sort_order") // Nova chave
+        val SORT_ORDER_KEY = stringPreferencesKey("sort_order")
     }
 
     val isDarkMode: Flow<Boolean> = context.dataStore.data.map { it[DARK_MODE_KEY] ?: false }
