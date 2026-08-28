@@ -16,7 +16,7 @@ import br.com.renan.vinylcollection.ui.navigation.AppNavigation
 import br.com.renan.vinylcollection.ui.theme.VinylCollectionTheme
 import br.com.renan.vinylcollection.ui.viewmodel.SettingsViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import androidx.work.ExistingPeriodicWorkPolicy
+    import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import br.com.renan.vinylcollection.core.workers.DailyVinylWorker

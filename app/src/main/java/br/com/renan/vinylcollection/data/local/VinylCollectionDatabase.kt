@@ -11,7 +11,7 @@ import br.com.renan.vinylcollection.data.local.entity.VinylRecord
 
 @Database(
     entities = [VinylRecord::class, Task::class],
-    version = 1,
+    version = 3,
     exportSchema = false
 )
 abstract class VinylCollectionDatabase : RoomDatabase() {

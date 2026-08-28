@@ -67,7 +67,7 @@ fun DetailScreen(
             if (isSaved) {
                 FloatingActionButton(
                     onClick = {
-                        localItem.let {
+                        localItem?.let {
                             viewModel.removeVinylFromLocalCollection(it)
                             Toast.makeText(context, "Disco removido!", Toast.LENGTH_SHORT).show()
                             onBackClick()

@@ -8,6 +8,7 @@ data class VinylRecord(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
     val discogsId: Int?,
+    val instanceId: Long? = null,
     val title: String,
     val artist: String,
     val coverUrl: String?,

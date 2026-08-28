@@ -20,6 +20,8 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 
+import android.util.Log
+
 sealed class SearchUiState {
     object Idle : SearchUiState()
     object Loading : SearchUiState()
@@ -64,14 +66,39 @@ class VinylViewModel @Inject constructor(
 
     fun addVinylToLocalCollection(vinylRecord: VinylRecord) {
         viewModelScope.launch {
-            repository.saveVinylToCollection(vinylRecord)
+            val insertedId = repository.saveVinylToCollection(vinylRecord)
+            val recordWithId = vinylRecord.copy(id = insertedId.toInt())
             notificationManager.showItemSavedNotification(vinylRecord.title)
+
+            vinylRecord.discogsId?.let { releaseId ->
+                val result = repository.addVinylToRemoteCollection(releaseId = releaseId)
+                result.onSuccess { instanceId ->
+                    Log.d("VinylViewModel", "POST Sucesso: Disco $releaseId adicionado à coleção remota no Discogs (Instance $instanceId).")
+                    if (instanceId != null) {
+                        repository.saveVinylToCollection(recordWithId.copy(instanceId = instanceId))
+                    }
+                }.onFailure { e ->
+                    Log.e("VinylViewModel", "POST Falha: ${e.message}")
+                }
+            }
         }
     }
 
     fun removeVinylFromLocalCollection(vinylRecord: VinylRecord) {
         viewModelScope.launch {
             repository.removeVinylFromCollection(vinylRecord)
+
+            vinylRecord.discogsId?.let { releaseId ->
+                val result = repository.removeVinylFromRemoteCollection(
+                    releaseId = releaseId,
+                    providedInstanceId = vinylRecord.instanceId
+                )
+                result.onSuccess {
+                    Log.d("VinylViewModel", "DELETE Sucesso: Disco $releaseId removido da coleção remota no Discogs.")
+                }.onFailure { e ->
+                    Log.e("VinylViewModel", "DELETE Falha: ${e.message}")
+                }
+            }
         }
     }
 }
