@@ -2,11 +2,13 @@ package br.com.renan.vinylcollection.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import br.com.renan.vinylcollection.data.local.entity.Task
 import br.com.renan.vinylcollection.data.local.entity.VinylRecord
 import br.com.renan.vinylcollection.data.repository.VinylRepository
 import br.com.renan.vinylcollection.data.network.dto.SearchResultItem
 import br.com.renan.vinylcollection.core.notifications.VinylNotificationManager
 
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -99,6 +101,31 @@ class VinylViewModel @Inject constructor(
                     Log.e("VinylViewModel", "DELETE Falha: ${e.message}")
                 }
             }
+        }
+    }
+
+    fun getTasksForVinyl(vinylId: Int): Flow<List<Task>> {
+        return repository.getTasksForVinyl(vinylId)
+    }
+
+    fun addTask(vinylId: Int, description: String) {
+        if (description.isBlank()) return
+        viewModelScope.launch {
+            val newTask = Task(vinylRecordId = vinylId, description = description.trim())
+            repository.saveTask(newTask)
+        }
+    }
+
+    fun toggleTaskCompleted(task: Task) {
+        viewModelScope.launch {
+            val updatedTask = task.copy(isCompleted = !task.isCompleted)
+            repository.updateTask(updatedTask)
+        }
+    }
+
+    fun deleteTask(task: Task) {
+        viewModelScope.launch {
+            repository.deleteTask(task)
         }
     }
 }

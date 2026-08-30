@@ -52,6 +52,14 @@ class VinylRepository(
         taskDao.insertTask(task)
     }
 
+    suspend fun updateTask(task: Task) {
+        taskDao.updateTask(task)
+    }
+
+    suspend fun deleteTask(task: Task) {
+        taskDao.deleteTask(task)
+    }
+
     /**
      * Realiza a busca no servidor do Discogs.
      */
