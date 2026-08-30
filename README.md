@@ -152,7 +152,7 @@ O `VinylNotificationManager` cria o canal `vinyl_collection_channel` e dispara d
 
 ## Autor
 
-**Renan Lucas de Moura**
-Estudante de Engenharia da Computação
+**Renan Lucas de Moura**  
+Estudante de Engenharia da Computação  
 GitHub: [github.com/RenanLM](https://github.com/RenanLM)
 LinkedIn: [linkedin.com/in/renanlmoura](https://www.linkedin.com/in/renanlmoura)
