@@ -26,6 +26,7 @@ class DailyVinylWorker @AssistedInject constructor(
 
             if (randomRecord != null) {
                 notificationManager.showDailyVinylNotification(
+                    vinylId = randomRecord.id,
                     title = randomRecord.title,
                     artist = randomRecord.artist
                 )

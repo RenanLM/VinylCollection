@@ -2,9 +2,14 @@ package br.com.renan.vinylcollection.core.notifications
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
+import android.app.TaskStackBuilder
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import androidx.core.app.NotificationCompat
+import br.com.renan.vinylcollection.MainActivity
 import br.com.renan.vinylcollection.R
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
@@ -46,12 +51,28 @@ class VinylNotificationManager @Inject constructor(
         notificationManager.notify(System.currentTimeMillis().toInt(), notification)
     }
 
-    fun showDailyVinylNotification(title: String, artist: String) {
+    fun showDailyVinylNotification(vinylId: Int, title: String, artist: String) {
+        val deepLinkIntent = Intent(
+            Intent.ACTION_VIEW,
+            Uri.parse("vinylcollection://detail/$vinylId"),
+            context,
+            MainActivity::class.java
+        )
+
+        val deepLinkPendingIntent: PendingIntent? = TaskStackBuilder.create(context).run {
+            addNextIntentWithParentStack(deepLinkIntent)
+            getPendingIntent(
+                vinylId,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+        }
+
         val notification = NotificationCompat.Builder(context, channelId)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setContentTitle("🎵 Disco do Dia!")
             .setContentText("Que tal ouvir '$title' do $artist hoje?")
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setContentIntent(deepLinkPendingIntent)
             .setAutoCancel(true)
             .build()
 

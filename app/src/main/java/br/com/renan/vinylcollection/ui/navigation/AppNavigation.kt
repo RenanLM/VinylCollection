@@ -7,6 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import androidx.navigation.navDeepLink
 import br.com.renan.vinylcollection.ui.screens.DetailScreen
 import br.com.renan.vinylcollection.ui.screens.HomeScreen
 import br.com.renan.vinylcollection.ui.screens.SearchScreen
@@ -75,7 +76,8 @@ fun AppNavigation() {
 
         composable(
             route = Screen.Detail.route,
-            arguments = listOf(navArgument("vinylId") { type = NavType.IntType })
+            arguments = listOf(navArgument("vinylId") { type = NavType.IntType }),
+            deepLinks = listOf(navDeepLink { uriPattern = "vinylcollection://detail/{vinylId}" })
         ) { backStackEntry ->
             val vinylId = backStackEntry.arguments?.getInt("vinylId") ?: 0
 
